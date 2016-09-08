@@ -212,14 +212,6 @@ CanvasRenderer.prototype.prepare = function(node) {
                     color: this.state.color,
                 });
                 break;
-            case "overrightarrow-line":
-                this.horizontalLines.push({
-                    y: this.state.ypos,
-                    height: Math.max(1, 0.04 * this.state.em),
-                    color: this.state.color,
-                    overrightarrow: true,
-                });
-                break;
             case "mfrac":
             case "accent":
             case "op-limits":
@@ -373,7 +365,6 @@ CanvasRenderer.prototype.prepare = function(node) {
             case "mult":
             case "op-symbol":
             case "overline":
-            case "overrightarrow":
             case "reset-scriptscriptstyle":
             case "reset-scriptstyle":
             case "reset-size1":
@@ -586,29 +577,9 @@ function PreparedBox(canvas, atoms, xshift) {
                     ctxt.fillText(atom.text, atom.x + x, atom.y + y);
                     // console.log(i+" : fillText -> "+atom.text);
                     // console.log(atom);
-                } else if (atom.width || atom.height) {
-                    // if it's an overrightarrow :
-                    if (atom.overrightarrow) {
-                        var l0 = atom.width;
-                        var l1 = l0 - atom.width / 8;
-                        var l2 = l0 - atom.width / 6;
-                        var vw = 6 * atom.height;
-                        var vx = atom.x + x;
-                        var vy = atom.y + y - atom.height - 2;
-                        ctxt.beginPath();
-                        ctxt.moveTo(vx, vy);
-                        ctxt.lineTo(vx + l1, vy);
-                        ctxt.lineTo(vx + l2, vy - (vw - atom.height) / 2);
-                        ctxt.lineTo(vx + l0, vy + atom.height / 2);
-                        ctxt.lineTo(vx + l2, vy + (vw + atom.height) / 2);
-                        ctxt.lineTo(vx + l1, vy + atom.height);
-                        ctxt.lineTo(vx, vy + atom.height);
-                        ctxt.lineTo(vx, vy);
-                        ctxt.fill();
-                    } else {
-                        ctxt.fillRect(atom.x + x, atom.y + y - atom.height,
-                            atom.width, atom.height);
-                    }
+                } else {
+                    ctxt.fillRect(atom.x + x, atom.y + y - atom.height,
+                        atom.width, atom.height);
                 }
             }
         });
