@@ -13,3 +13,4 @@ diff.png
 .DS_Store
 .npm-install.stamp
 dist/
+.eslintrc
