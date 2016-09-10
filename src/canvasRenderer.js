@@ -3,7 +3,7 @@
 var align = { left: 0, center: 0.5, right: 1 };
 
 var sizes = [
-    null, 0.5, 0.7, 0.8, 0.9, 1.0, 1.2, 1.44, 1.73, 2.07, 2.49,
+    null, 0.5, 0.7, 0.8, 0.9, 1.0, 1.2, 1.44, 1.73, 2.07, 2.49
 ];
 
 function CanvasState(orig) {
@@ -84,7 +84,7 @@ function CanvasRenderer(ctxt, options) {
         family: "KaTeX_Main",
         color: null,
         ypos: 0,
-        halign: options.halign || align.left,
+        halign: options.halign || align.left
     });
     this.state.sizeChanged();
 }
@@ -126,14 +126,14 @@ var spacePairsTextStyle = {
     "minner_mrel": thickspace,
     "minner_mopen": thinspace,
     "minner_mpunct": thinspace,
-    "minner_minner": thinspace,
+    "minner_minner": thinspace
 };
 var spacePairs = {
     "mord_mop": thinspace,
     "mop_mord": thinspace,
     "mop_mop": thinspace,
     "mclose_mop": thinspace,
-    "minner_mop": thinspace,
+    "minner_mop": thinspace
 };
 
 CanvasRenderer.prototype.prepare = function(node) {
@@ -148,10 +148,7 @@ CanvasRenderer.prototype.prepare = function(node) {
         classes = classes.split(" ");
     }
 
-    var key = null;
-    var val = null;
-    var i = null;
-    var size = null;
+    var key, val, i, size = null;
 
     function findSize() {
         if (size === null) {
@@ -195,6 +192,11 @@ CanvasRenderer.prototype.prepare = function(node) {
             case "delim-size4":
                 this.state = this.state.withFace("", "KaTeX_Size4");
                 break;
+            case "delimsizing":
+                if (findSize() !== null) {
+                    this.state = this.state.withFace("", "KaTeX_Size" + size);
+                }
+                break;
 
             case "fontsize-ensurer":
             case "sizing":
@@ -209,7 +211,7 @@ CanvasRenderer.prototype.prepare = function(node) {
                 this.horizontalLines.push({
                     y: this.state.ypos,
                     height: Math.max(1, 0.04 * this.state.em),
-                    color: this.state.color,
+                    color: this.state.color
                 });
                 break;
             case "overrightarrow-line":
@@ -217,7 +219,7 @@ CanvasRenderer.prototype.prepare = function(node) {
                     y: this.state.ypos,
                     height: Math.max(1, 0.04 * this.state.em),
                     color: this.state.color,
-                    overrightarrow: true,
+                    overrightarrow: true
                 });
                 break;
             case "mfrac":
@@ -276,6 +278,7 @@ CanvasRenderer.prototype.prepare = function(node) {
             case "mrel":
             case "mopen":
             case "mclose":
+            case "minner":
             case "mpunct":
             case "minner":
                 nodeClass = className;
@@ -358,6 +361,7 @@ CanvasRenderer.prototype.prepare = function(node) {
             case "rlap":
                 lap = className;
                 break;
+
             case "arraycolsep":
             case "base":
             case "baseline-fix":
@@ -397,64 +401,60 @@ CanvasRenderer.prototype.prepare = function(node) {
 
             default:
                 // TODO: should throw an exception here one day
-                // console.log("Don't know how to handle class " + className);
+                console.log("Don't know how to handle class " + className);
         }
     }
     for (key in node.style) {
-        if (node.style.hasOwnProperty(key)) {
-            val = node.style[key];
-            switch (key) {
-                case "top":
-                    if (val.substr(val.length - 2) !== "em") {
-                        throw new Error("em is the only supported unit.");
-                    }
-                    val = +val.substr(0, val.length - 2);
-                    this.state = this.state.withYShift(val);
-                    break;
-                case "fontSize":
-                    if (val === "0em") {
-                        // makeFontSizer sometimes builds these
-                        return;
-                    }
-                    // TODO: Handle font-sizer for non-zero font size
-                    break;
-                case "marginLeft":
-                    if (val.substr(val.length - 2) !== "em") {
-                        throw new Error("em is the only supported unit.");
-                    }
-                    marginLeft = +val.substr(0, val.length - 2);
-                    break;
-                case "marginRight":
-                case "width":
-                    if (val.substr(val.length - 2) !== "em") {
-                        throw new Error("em is the only supported unit.");
-                    }
-                    marginRight = +val.substr(0, val.length - 2);
-                    break;
-                case "color":
-                    this.state = this.state.withColor(val);
-                    break;
-                case "height":
-                case "verticalAlign":
-                    // These two usually are for struts
-                    break;
-                default:
-                    // TODO: should throw an exception here one day
-                    // console.log("Don't know how to handle style " + key);
-            }
+        val = node.style[key];
+        switch (key) {
+            case "top":
+                if (val.substr(val.length - 2) !== "em") {
+                    throw new Error("em is the only supported unit.");
+                }
+                val = +val.substr(0, val.length - 2);
+                this.state = this.state.withYShift(val);
+                break;
+            case "fontSize":
+                if (val === "0em") {
+                    // makeFontSizer sometimes builds these
+                    return;
+                }
+                // TODO: Handle font-sizer for non-zero font size
+                break;
+            case "marginLeft":
+                if (val.substr(val.length - 2) !== "em") {
+                    throw new Error("em is the only supported unit.");
+                }
+                marginLeft = +val.substr(0, val.length - 2);
+                break;
+            case "marginRight":
+            case "width":
+                if (val.substr(val.length - 2) !== "em") {
+                    throw new Error("em is the only supported unit.");
+                }
+                marginRight = +val.substr(0, val.length - 2);
+                break;
+            case "color":
+                this.state = this.state.withColor(val);
+                break;
+            case "height":
+            case "verticalAlign":
+                // These two usually are for struts
+                break;
+            default:
+                // TODO: should throw an exception here one day
+                console.log("Don't know how to handle style " + key);
         }
     }
     for (key in node.attributes) {
-        if (node.attributes.hasOwnProperty(key)) {
-            val = node.attributes[key];
-            switch (key) {
-                case "aria-hidden":
-                    // ignore
-                    break;
-                default:
-                    // TODO: should throw an exception here one day
-                    // console.log("Don't know how to handle attribute " + key);
-            }
+        val = node.attributes[key];
+        switch (key) {
+            case "aria-hidden":
+                // ignore
+                break;
+            default:
+                // TODO: should throw an exception here one day
+                console.log("Don't know how to handle attribute " + key);
         }
     }
 
@@ -488,7 +488,7 @@ CanvasRenderer.prototype.prepare = function(node) {
                 y: this.state.ypos,
                 font: this.state.font,
                 color: this.state.color,
-                text: text,
+                text: text
             };
             this.outList.push(atom);
         }
@@ -505,8 +505,7 @@ CanvasRenderer.prototype.prepare = function(node) {
 // Align a list of children to a common vertical axis.
 // Alignment is one of 0 (left), 0.5 (centered) or 1 (right).
 CanvasRenderer.prototype.halign = function(children, alignment) {
-    var i;
-    var shift;
+    var i, shift;
     var oldLines = this.horizontalLines;
     this.horizontalLines = [];
     var outList = this.outList;
@@ -548,7 +547,7 @@ CanvasRenderer.prototype.lap = function(lap, children) {
     this.prepare(child);
     var width = this.x - oldX;
     this.x = oldX;
-    if (lap === "llap") {
+    if (lap == "llap") {
         while (mark < outList.length) {
             outList[mark++].x -= width;
         }
@@ -583,27 +582,35 @@ function PreparedBox(canvas, atoms, xshift) {
                 if (atom.text) {
                     ctxt.font = atom.font;
                     ctxt.fillText(atom.text, atom.x + x, atom.y + y);
+                    // console.log(i+" : fillText -> "+atom.text);
+                    // console.log(atom);
                 } else if (atom.width || atom.height) {
                     // if it's an overrightarrow :
                     if (atom.overrightarrow) {
-                        ctxt.save();
-                        var l0 = atom.width;
-                        var vx = atom.x + x;
-                        ctxt.font = (atom.height * 18) + "px KaTeX_Main";
-                        ctxt.textAlign = "right";
-                        ctxt.fillText("→", vx + l0, atom.y + y);
-                        ctxt.lineWidth = (0.8 * atom.height);
-                        ctxt.lineCap = "round";
+                        var l0 = atom.width,
+                            l1 = l0 - atom.width/8,
+                            l2 = l0 - atom.width/6,
+                            vw = 6 * atom.height,
+                            vx = atom.x + x,
+                            vy = atom.y + y - atom.height-2;
                         ctxt.beginPath();
-                        ctxt.moveTo(vx, atom.y + y - (4.5 * atom.height));
-                        ctxt.lineTo(vx + l0 - (atom.height * 3),
-                            atom.y + y - (4.5 * atom.height));
-                        ctxt.stroke();
-                        ctxt.restore();
+                        ctxt.moveTo(vx, vy);
+                        ctxt.lineTo(vx + l1, vy);
+                        ctxt.lineTo(vx + l2, vy - (vw - atom.height) / 2);
+                        ctxt.lineTo(vx + l0, vy + atom.height / 2);
+                        ctxt.lineTo(vx + l2, vy + (vw + atom.height) / 2);
+                        ctxt.lineTo(vx + l1, vy + atom.height);
+                        ctxt.lineTo(vx, vy + atom.height);
+                        ctxt.lineTo(vx, vy);
+                        ctxt.fill();
                     } else {
                         ctxt.fillRect(atom.x + x, atom.y + y - atom.height,
-                        atom.width, atom.height);
+                            atom.width, atom.height);
                     }
+
+                    // console.log(i+" : fillRect -> x="+(atom.x + x)+" y="+(atom.y + y - atom.height)+" w="+
+                    //     atom.width+" h="+ atom.height);
+                    // console.log(atom);
                 }
             }
         });
@@ -631,5 +638,5 @@ function render(dom, canvas, x, y, options) {
 
 module.exports = {
     prepare: prepare,
-    render: render,
+    render: render
 };
